@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Login from './components/Login/Login';
 import Home from './components/Home/Home';
 import MainHeader from './components/MainHeader/MainHeader';
+import AuthContext from './store/auth-context';
 
 function App() {
 
@@ -30,14 +31,25 @@ function App() {
     setIsLoggedIn(false);
   };
 
+  //  AuthContext.Provider is a component somehow!
+  //  All components (and their children) btw the <AuthContext.Provider> and the </AuthContext.Provider>
+  //  will have access to its props!
+
+  //  Something abt don't need the .Provider if u have a default value,
+  //  but that's not what u should use it for, should use it for changable props.
+
+  //  "value" is a pre-coded prop, so have to call it that.
+  //  Here is how to pass the isLoggedIn to the AuthContext instead of as a prop.
   return (
-    <React.Fragment>
+    <AuthContext.Provider value={{
+      isLoggedIn: isLoggedIn
+    }}>
       <MainHeader isAuthenticated={isLoggedIn} onLogout={logoutHandler} />
       <main>
         {!isLoggedIn && <Login onLogin={loginHandler} />}
         {isLoggedIn && <Home onLogout={logoutHandler} />}
       </main>
-    </React.Fragment>
+    </AuthContext.Provider>
   );
 }
 

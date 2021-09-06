@@ -55,13 +55,18 @@ const Login = (props) => {
     };
   });
 
-  /*useEffect(() => {
+  //  This is called "object destructuring". Re-saves "isValid" as "emailIsValid".
+  //  Called "allias assignment".
+  const {isValid: emailIsValid} = emailState;
+  const {isValid: passwordIsValid} = passwordState;
+
+  useEffect(() => {
     //  This is a timer that runs 500ms after a user stops typing!
     //  identifier = handler.
     const identifier = setTimeout(() => {
       console.log('Checking form validity!');
       setFormIsValid(
-        enteredEmail.includes('@') && enteredPassword.trim().length > 6
+        emailIsValid && passwordIsValid
       );
     }, 500);
 
@@ -74,24 +79,25 @@ const Login = (props) => {
       //  This clears the timer as long as the user keeps typing (doesn't stop for 500ms).
       clearTimeout(identifier);
     };
-  }, [enteredEmail, enteredPassword]);*/
+    //  This uses the alliases to only run the useEffect() when that part of the useReducer() updates.
+  }, [emailIsValid, passwordIsValid]);
 
   const emailChangeHandler = (event) => {
     //  It's convention to do a string of all caps for this.
     //  It triggers the emailReducer() function to execute.
     dispatchEmail({type: 'USER_INPUT', val: event.target.value});
-    setFormIsValid(
+    /*setFormIsValid(
       //  This is the state in the useReducer():
       emailState.value.includes('@') && passwordState.isValid
-    );
+    );*/
   };
 
   const passwordChangeHandler = (event) => {
     dispatchPassword({type: 'USER_INPUT', val: event.target.value});
-    setFormIsValid(
+    /*setFormIsValid(
       //  From useReducer():
       emailState.isValid && event.target.value.trim().length > 6
-    );
+    );*/
   };
 
   const validateEmailHandler = () => {
