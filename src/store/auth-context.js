@@ -15,7 +15,8 @@ const AuthContext = React.createContext({
     onLogin: (email, password) => {}
 });
 
-const AuthContextProvider = (props) => {
+//  The error was you didn't have this export!
+export const AuthContextProvider = (props) => {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 

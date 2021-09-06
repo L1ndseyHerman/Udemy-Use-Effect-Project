@@ -28,7 +28,7 @@ function App() {
         {!ctx.isLoggedIn && <Login />}
         {ctx.isLoggedIn && <Home />}
       </main>
-      </React.Fragment>
+    </React.Fragment>
   );
 }
 
