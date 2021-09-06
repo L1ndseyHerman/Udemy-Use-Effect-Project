@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
@@ -11,20 +11,41 @@ const Login = (props) => {
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
+  useEffect(() => {
+    console.log('EFFECT RUNNING');
+    return () => {
+      //  Runs on logout or something.
+      console.log('EFFECT CLEANUP');
+    };
+  });
+
+  useEffect(() => {
+    //  This is a timer that runs 500ms after a user stops typing!
+    //  identifier = handler.
+    const identifier = setTimeout(() => {
+      console.log('Checking form validity!');
+      setFormIsValid(
+        enteredEmail.includes('@') && enteredPassword.trim().length > 6
+      );
+    }, 500);
+
+    //  Can only return a function from a useEffect()!
+    //  This one is an anonymous arrow function, but could do a named function as well.
+    //  Called a "cleanup" function. Runs BEFORE the other code in the useEffect, except for 
+    //  the first time. Also when the component is removed from the DOM or something?
+    return () => {
+      console.log('CLEANUP');
+      //  This clears the timer as long as the user keeps typing (doesn't stop for 500ms).
+      clearTimeout(identifier);
+    };
+  }, [enteredEmail, enteredPassword]);
+
   const emailChangeHandler = (event) => {
     setEnteredEmail(event.target.value);
-
-    setFormIsValid(
-      event.target.value.includes('@') && enteredPassword.trim().length > 6
-    );
   };
 
   const passwordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
-
-    setFormIsValid(
-      event.target.value.trim().length > 6 && enteredEmail.includes('@')
-    );
   };
 
   const validateEmailHandler = () => {
