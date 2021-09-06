@@ -1,15 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
 
+//  Can be outside of the component function bec don't need any data from the component.
+const emailReducer = (state, action) => {
+  //  In this example, the action is an object, but it doesn't have to be.
+  if (action.type === 'USER_INPUT') {
+    return {value: action.val, isValid: action.val.includes('@')};
+  }
+  if (action.type === 'INPUT_BLUR') {
+    //  The state will always be the last state, no danger of it maybe not if thread didn't run yet.
+    return {value: state.value, isValid: state.value.includes('@')};
+  }
+  return {value: '', isValid: false};
+};
+
 const Login = (props) => {
-  const [enteredEmail, setEnteredEmail] = useState('');
-  const [emailIsValid, setEmailIsValid] = useState();
+  //  Could put all 5 states into one useReducer(), but just doing groups of 2 here.
+  //const [enteredEmail, setEnteredEmail] = useState('');
+  //const [emailIsValid, setEmailIsValid] = useState();
   const [enteredPassword, setEnteredPassword] = useState('');
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
+
+  //  Could do an anonymous function like this, or make a named function like above:
+  //const [emailState, dispatchEmail] = useReducer(() => {});
+  const [emailState, dispatchEmail] = useReducer(emailReducer, {
+    value: '', 
+    isValid: false
+  });
 
   useEffect(() => {
     console.log('EFFECT RUNNING');
@@ -19,7 +40,7 @@ const Login = (props) => {
     };
   });
 
-  useEffect(() => {
+  /*useEffect(() => {
     //  This is a timer that runs 500ms after a user stops typing!
     //  identifier = handler.
     const identifier = setTimeout(() => {
@@ -38,18 +59,31 @@ const Login = (props) => {
       //  This clears the timer as long as the user keeps typing (doesn't stop for 500ms).
       clearTimeout(identifier);
     };
-  }, [enteredEmail, enteredPassword]);
+  }, [enteredEmail, enteredPassword]);*/
 
   const emailChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);
+    //  It's convention to do a string of all caps for this.
+    //  It triggers the emailReducer() function to execute.
+    dispatchEmail({type: 'USER_INPUT', val: event.target.value});
+    setFormIsValid(
+      //  This is the state in the useReducer():
+      emailState.value.includes('@') && enteredPassword.trim().length > 6
+    );
   };
 
   const passwordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
+    setFormIsValid(
+      //  From useReducer():
+      emailState.isValid && event.target.value.trim().length > 6
+    );
   };
 
   const validateEmailHandler = () => {
-    setEmailIsValid(enteredEmail.includes('@'));
+    //  Once again, coming from the useReducer().
+    //  Make sure the object property names here are the same as everywhere else.
+    //  The string is 'INPUT_BLUR' bec this happens when the input looses focus (user clicks out of it).
+    dispatchEmail({type: 'INPUT_BLUR'});
   };
 
   const validatePasswordHandler = () => {
@@ -58,7 +92,7 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(enteredEmail, enteredPassword);
+    props.onLogin(emailState.value, enteredPassword);
   };
 
   return (
@@ -66,14 +100,14 @@ const Login = (props) => {
       <form onSubmit={submitHandler}>
         <div
           className={`${classes.control} ${
-            emailIsValid === false ? classes.invalid : ''
+            emailState.isValid === false ? classes.invalid : ''
           }`}
         >
           <label htmlFor="email">E-Mail</label>
           <input
             type="email"
             id="email"
-            value={enteredEmail}
+            value={emailState.value}
             onChange={emailChangeHandler}
             onBlur={validateEmailHandler}
           />
